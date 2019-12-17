@@ -89,18 +89,6 @@ filter(field, Language %in% c('BE', 'US')) %>%
   summarize(ACC = mean(ACC))
 ```
 
-About the same. These can safely be lumped together:
-
-```{r}
-field <- mutate(field,
-                Language = ifelse(Language %in% c('BE', 'US'),
-                                  'EN', Language))
-
-# Check:
-
-table(filter(field, !duplicated(ID))$Language)
-```
-
 ## Descriptive statistics
 
 Check overall accuracy across languages:
@@ -189,7 +177,7 @@ speaker_avgs <- field %>% group_by(ID, Language, Sex, Age) %>%
 
 # Check:
 
-speaker_avgs
+sum(speaker_avgs > 1/12) / nrow(speaker_avgs)
 ```
 
 All speakers above chance!
@@ -198,9 +186,7 @@ Check accuracy by gender:
 
 ```{r}
 speaker_avgs %>% group_by(Sex) %>% 
-  summarize(ACC = mean(ACC)) %>% 
-  arrange(desc(ACC)) %>% 
-  print(n = Inf)
+  summarize(ACC = mean(ACC))
 ```
 
 Check accuracy by age:
@@ -429,34 +415,11 @@ What's the mean correlation?
 mean(r_vals, na.rm = TRUE)
 ```
 
-
 What are the p-values?:
 
 ```{r}
 p_vals
 ```
-
-These need to be corrected for performing 15 correlations:
-
-```{r}
-# Vector of adjusted p-values from upper triangle of the matrix:
-
-adjusted_p <- p.adjust(p_vals[upper.tri(p_vals)], method = 'bonferroni', n = 15)
-
-# Replace lower triangle with NAs to avoid confusion:
-
-p_vals[lower.tri(p_vals)] <- NA
-
-# Save adjusted p-values back into upper triangle:
-
-p_vals[upper.tri(p_vals)] <- adjusted_p
-
-# Check:
-
-p_vals
-```
-
-The only ones that don't "significantly" correlate with each other after correction are SR ~ BR and SR ~ PA. All others are correlated, even if correcting for 15 tests.
 
 This completes this analysis.
 

@@ -148,15 +148,23 @@ web %>% group_by(subcategory) %>%
 Check accuracy by gender:
 
 ```{r}
+# By-speaker averages:
+
 speaker_avgs <- web %>% group_by(ID, Language, Sex, Age) %>% 
   summarize(ACC = mean(ACC)) %>% 
   arrange(desc(ACC)) %>% 
-  print(n = Inf)
+  print(n = 10)
+
+# Average:
 
 speaker_avgs %>% group_by(Sex) %>% 
-  summarize(ACC = mean(ACC)) %>% 
-  arrange(desc(ACC)) %>% 
-  print(n = Inf)
+  summarize(ACC = mean(ACC))
+```
+
+How any speakers above chance?
+
+```{r}
+sum(speaker_avgs$ACC > 1/6) / nrow(speaker_avgs)
 ```
 
 All speakers above chance!
@@ -187,6 +195,15 @@ web %>% group_by(Rep) %>%
 ```
 
 If at all accuracy decreases.
+
+Check accuracy by L2 proficiency:
+
+```{r}
+web %>% group_by(EnglishL2) %>% 
+  summarize(ACC = mean(ACC))
+```
+
+
 
 ## Marcus's descriptive statistics: how many meanings per language above chance?
 
